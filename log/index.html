@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      #output { list-style-type: none; margin: 0; padding: 0; }
+      #output li { padding: 5px 10px; }
+      #output li:nth-child(odd) { background: #eee; }
+      #output li:last-child {background: #0000FF; }
+  </style>
+  
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+
+    //socket
+    var socket = io();
+
+    //number of lines
+    var len = 0;
+
+    //connecting to server socket
+    socket.on('connected', function(data){
+      //if connected reading file data
+      socket.emit('openFile');
+    })
+   
+    //getting initial file data
+    socket.on('initialFileData', function(data){
+        console.log(data.text)
+
+        //setting initial lines length
+        len = data.text.length;
+
+        //looping over array data to create list item
+        data.text.forEach(element => {
+          document.getElementById('output').innerHTML += '<li>'+ element +'</li>';
+       });
+    });
+
+    //checking for continuous data
+    socket.on('continuousFileData', function(data){
+        console.log(data.text)
+
+        data.text.forEach(element => {
+          document.getElementById('output').innerHTML += '<li>'+ element +'</li>';
+          len = len + 1;
+        });
+
+    });
+
+
+    socket.on('error', function(data)
+    {
+        window.alert(data);
+    });
+
+
+	</script>
+  </head>
+
+  <body>
+    <ul id="output"></ul>
+  </body>
+
+</html>
